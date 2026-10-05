@@ -253,7 +253,8 @@
 <tr><td>Type <td>Real Number
 <tr><td>Range<td>1...1e+10
 <tr><td>Default Value<td>1e+06<tr><td>Description <td>Center (mean) of the generated ion energy distribution in eV.
-<tr><th colspan="2">\anchor _IonBeam_energy_distribution_fwhm /IonBeam/energy_distribution/fwhm<tr><td>Label <td>FWHM (eV)
+<h4>Notes</h4><ul><li>The stopping and scattering tables limit the ion energy to at most 2^30 eV (about 1.07 GeV), less for light ions in light targets. Validation reports the highest allowed energy for the given ion and target.</li>
+</ul><tr><th colspan="2">\anchor _IonBeam_energy_distribution_fwhm /IonBeam/energy_distribution/fwhm<tr><td>Label <td>FWHM (eV)
 <tr><td>Type <td>Real Number
 <tr><td>Range<td>1...1e+10
 <tr><td>Default Value<td>1.0<tr><td>Description <td>Full-width at half-maximum of the generated ions energy distribution in eV.
@@ -381,7 +382,8 @@
 <tr><td>Type <td>Real Number
 <tr><td>Range<td>0.001...1000
 <tr><td>Default Value<td>10.0<tr><td>Description <td>Surface binding energy [eV].
-<tr><th colspan="2">\anchor _Target_materials_0_composition_0_Er /Target/materials/0/composition/0/Er<tr><td>Label <td>Replacement energy [eV]
+<h4>Notes</h4><ul><li>Currently not used in the simulation: sputtering and surface binding are not implemented.</li>
+</ul><tr><th colspan="2">\anchor _Target_materials_0_composition_0_Er /Target/materials/0/composition/0/Er<tr><td>Label <td>Replacement energy [eV]
 <tr><td>Type <td>Real Number
 <tr><td>Range<td>0.001...1000
 <tr><td>Default Value<td>40.0<tr><td>Description <td>Replacement energy [eV].

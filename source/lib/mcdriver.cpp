@@ -332,6 +332,60 @@ using std::endl;
         ret = false;                                                  \
     }
 
+// Reduced energy conversion factor [1/eV] for a collision a->b if the scattering
+// is tabulated, 0 if it is calculated analytically (unscreened, MAGIC)
+static float tabulated_red_E_conv(mccore::screening_t s, const element_t &a, const element_t &b)
+{
+    int Z1 = a.atomic_number, Z2 = b.atomic_number;
+    float M1 = a.atomic_mass, M2 = b.atomic_mass;
+    switch (s) {
+    case mccore::Bohr:
+        return xs_lab<Screening::Bohr>(Z1, M1, Z2, M2).red_E_conv();
+    case mccore::KrC:
+        return xs_lab<Screening::KrC>(Z1, M1, Z2, M2).red_E_conv();
+    case mccore::Moliere:
+        return xs_lab<Screening::Moliere>(Z1, M1, Z2, M2).red_E_conv();
+    case mccore::ZBL:
+        return xs_lab<Screening::ZBL>(Z1, M1, Z2, M2).red_E_conv();
+    default:
+        return 0.f;
+    }
+}
+
+// Highest beam energy [eV] within the range of the internal tables: electronic
+// stopping & flight path (ion energy) and scattering (reduced energy) for all
+// collisions of the beam ions and their recoils. Above it the tables are clamped.
+static float max_table_energy(const mcconfig &c)
+{
+    // moving species: beam ion + target atoms, r = max energy relative to the beam energy
+    std::vector<const element_t *> el{ &c.IonBeam.ion };
+    for (const auto &m : c.Target.materials)
+        for (const auto &a : m.composition)
+            el.push_back(&a.element);
+    int n = el.size();
+    std::vector<float> r(n, 0.f);
+    r[0] = 1.f;
+    // a recoil gets at most gamma = 4 M1 M2 / (M1 + M2)^2 of the moving atom energy
+    for (int it = 0; it < n; ++it)
+        for (int i = 0; i < n; ++i)
+            for (int k = 1; k < n; ++k) {
+                float M1 = el[i]->atomic_mass, M2 = el[k]->atomic_mass;
+                if (M1 > 0.f && M2 > 0.f)
+                    r[k] = std::max(r[k], r[i] * 4 * M1 * M2 / ((M1 + M2) * (M1 + M2)));
+            }
+
+    float Elim = dedx_erange::max;
+    for (int i = 0; i < n; ++i)
+        for (int k = 1; k < n; ++k) {
+            if (r[i] == 0.f || el[i]->atomic_number < 1 || el[k]->atomic_number < 1)
+                continue;
+            float f = tabulated_red_E_conv(c.Simulation.screening_type, *el[i], *el[k]);
+            if (f > 0.f)
+                Elim = std::min(Elim, scattering_tbl_grid::e_range_t::max / (f * r[i]));
+        }
+    return Elim;
+}
+
 int mcconfig::validate(bool AcceptIncomplete, std::ostream *os) const
 {
     bool ret = true;
@@ -461,6 +515,23 @@ int mcconfig::validate(bool AcceptIncomplete, std::ostream *os) const
         }
     }
     ret = ret && target_ret;
+
+    // Ion energy within the range of the internal tables
+    if (target_ret && !Target.materials.empty()) {
+        const auto &ed = IonBeam.energy_distribution;
+        float Emax = ed.center;
+        if (ed.type == ion_beam::Uniform)
+            Emax += ed.fwhm / 2;
+        else if (ed.type == ion_beam::Gaussian)
+            Emax += 3 * ed.fwhm / 2.354820045f; // center + 3 sigma
+        float Elim = max_table_energy(*this);
+        if (Emax > Elim) {
+            msg << "(/IonBeam/energy_distribution) Maximum ion energy " << Emax << " eV ";
+            msg << "exceeds the range of the stopping/scattering tables." << endl;
+            msg << "Highest allowed energy for this ion and target: " << Elim << " eV" << endl;
+            ret = false;
+        }
+    }
 
     // --- UserTally ---
     std::unordered_map<std::string, int> utmap; // map UserTally id->index

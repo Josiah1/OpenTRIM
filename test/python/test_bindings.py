@@ -35,7 +35,7 @@ def test_config_default():
     cfg = opentrim.Config()
     assert cfg.Run.max_no_ions == 100
     assert cfg.Run.max_cpu_time == 0
-    assert cfg.Run.threads == 1
+    assert cfg.Run.threads == 0  # 0 = automatic
     assert cfg.Run.seed == 123456789
 
 
@@ -366,3 +366,10 @@ def test_compound_correction(config):
     # full correction at low ion velocity, none at high velocity (He: 4 amu)
     assert r[E < 100e3] == pytest.approx(0.9, abs=1e-4)
     assert r[E > 100e6] == pytest.approx(1.0, abs=1e-4)
+
+
+def test_energy_above_table_range(config):
+    # the stopping/scattering tables end at 2^30 eV ~ 1.07 GeV
+    config.IonBeam.energy_distribution.center = 2e9
+    with pytest.raises(ValueError, match="Highest allowed energy"):
+        config.validate()

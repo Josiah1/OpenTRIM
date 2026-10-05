@@ -362,7 +362,7 @@
                             "max": 1.0e10,
                             "digits": 6,
                             "toolTip": "Center (mean) of the generated ion energy distribution in eV.",
-                            "whatsThis": ""
+                            "whatsThis": "The stopping and scattering tables limit the ion energy to at most 2^30 eV (about 1.07 GeV), less for light ions in light targets. Validation reports the highest allowed energy for the given ion and target."
                         },
                         {
                             "name": "fwhm",
@@ -690,7 +690,7 @@
                                             "max": 1000.0,
                                             "digits": 3,
                                             "toolTip": "Surface binding energy [eV].",
-                                            "whatsThis": ""
+                                            "whatsThis": "Currently not used in the simulation: sputtering and surface binding are not implemented."
                                         },
                                         {
                                             "name": "Er",
