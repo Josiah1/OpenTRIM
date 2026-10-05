@@ -56,6 +56,7 @@
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;\ref _Target_materials_0_id "\"id\"": "Iron",<br>
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;\ref _Target_materials_0_density "\"density\"": 7.8658,<br>
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;\ref _Target_materials_0_color "\"color\"": "#55aaff",<br>
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;\ref _Target_materials_0_compound_correction "\"compound_correction\"": 1.0,<br>
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;\ref _Target_materials_0_composition "\"composition\"": [<br>
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;{<br>
 &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;\ref _Target_materials_0_composition_0_element "\"element\"": {<br>
@@ -339,7 +340,12 @@
 <tr><th colspan="2">\anchor _Target_materials_0_color /Target/materials/0/color<tr><td>Label <td>Material color
 <tr><td>Type <td>String
 <tr><td>Default Value<td>"#55aaff"<tr><td>Description <td>HTML color code used for materials display.
-<tr><th colspan="2">\anchor _Target_materials_0_composition /Target/materials/0/composition<tr><td>Label <td>Material composition
+<tr><th colspan="2">\anchor _Target_materials_0_compound_correction /Target/materials/0/compound_correction<tr><td>Label <td>Compound correction
+<tr><td>Type <td>Real Number
+<tr><td>Range<td>0.1...10
+<tr><td>Default Value<td>1.0<tr><td>Description <td>Compound correction factor of the electronic stopping (1 = Bragg's rule).
+<h4>Notes</h4><ul><li>Multiplies the Bragg's rule electronic stopping of the material to account for chemical bonding, as SRIM's &quot;Compound Correction (Bragg)&quot;. The correction applies at low ion velocities and fades out above about 0.6 MeV/u (Ziegler &amp; Manoyan NIMB 35 (1988) 215). Use 1 for elemental targets or when no correction is known. For compounds in the SRIM dictionary, the value is shown in SRIM's TRIM setup window.</li>
+</ul><tr><th colspan="2">\anchor _Target_materials_0_composition /Target/materials/0/composition<tr><td>Label <td>Material composition
 <tr><td>Type <td>Options Array
 <tr><td>Description <td>List of elements making up the material's composition.
 <tr><th colspan="2">\anchor _Target_materials_0_composition_0_element /Target/materials/0/composition/0/element<tr><td>Label <td>Element definition

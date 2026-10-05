@@ -17,20 +17,20 @@ dedx_interp::dedx_interp(StoppingModel m, int Z1, float M1, int Z2, float atomic
 }
 
 dedx_interp::dedx_interp(StoppingModel m, int Z1, const std::vector<int> &Z2,
-                         const std::vector<float> &X2, float atomicDensity)
+                         const std::vector<float> &X2, float atomicDensity, float compoundCorr)
 {
     float M1 = periodic_table::at(Z1).mass;
-    init(m, Z1, M1, Z2, X2, atomicDensity);
+    init(m, Z1, M1, Z2, X2, atomicDensity, compoundCorr);
 }
 
 dedx_interp::dedx_interp(StoppingModel m, int Z1, float M1, const std::vector<int> &Z2,
-                         const std::vector<float> &X2, float atomicDensity)
+                         const std::vector<float> &X2, float atomicDensity, float compoundCorr)
 {
-    init(m, Z1, M1, Z2, X2, atomicDensity);
+    init(m, Z1, M1, Z2, X2, atomicDensity, compoundCorr);
 }
 
 int dedx_interp::init(StoppingModel m, int Z1, float M1, const std::vector<int> &Z2,
-                      const std::vector<float> &X2, float atomicDensity)
+                      const std::vector<float> &X2, float atomicDensity, float compoundCorr)
 {
     assert(Z2.size() == X2.size());
     assert(Z2.size() >= 1);
@@ -65,15 +65,18 @@ int dedx_interp::init(StoppingModel m, int Z1, float M1, const std::vector<int> 
                 buff[i] += w * std::exp(qspl(logEi));
             }
         }
-
-        /* The compound correction needs to be added here !!! */
-        /* following copied from corteo:
-            compound correction according to Zeigler & Manoyan NIMB35(1998)215, Eq.(16) (error in
-        Eq. 14) if(compoundCorr!=1.0f) for(k=0; k<DIMD; k++) { f = d2f( 1.0/(1.0+exp( 1.48*(
-        sqrt(2.*Dval(k)/projectileMass/25e3) -7.0) )) ); spp[k]*=f*(compoundCorr-1.0f)+1.0f;
-        }
-        */
     }
+
+    /*
+     * Compound correction according to Ziegler & Manoyan NIMB 35 (1988) 215, Eq. (16),
+     * as implemented in Corteo. f -> 1 at low ion velocity and f -> 0 above ~0.6 MeV/u.
+     * compoundCorr = 1 leaves the Bragg rule result unchanged.
+     */
+    if (compoundCorr != 1.f)
+        for (dedx_iterator i; i < dedx_erange::count; i++) {
+            double f = 1.0 / (1.0 + std::exp(1.48 * (std::sqrt(2.0 * (*i) / M1 / 25e3) - 7.0)));
+            buff[i] *= f * (compoundCorr - 1.0) + 1.0;
+        }
 
     set(buff);
 
@@ -168,10 +171,12 @@ int dedx_calc::init(const mccore &s)
             int im = mat->id();
             auto desc = mat->getDescription();
             if (stopping_ != electronic_stopping_t::Off) {
-                dedx_(iat1, im) =
-                        new dedx_interp(static_cast<StoppingModel>(stopping_), at1->Z(), at1->M(),
-                                        mat->Z(), mat->X(), mat->atomicDensity());
+                dedx_(iat1, im) = new dedx_interp(static_cast<StoppingModel>(stopping_), at1->Z(),
+                                                  at1->M(), mat->Z(), mat->X(),
+                                                  mat->atomicDensity(), mat->compoundCorrection());
 
+                // The compound correction is not passed to straggling: there it only
+                // enters as an ion/H stopping ratio at equal velocity, where it cancels.
                 if (straggling_ != electronic_straggling_t::Off) {
                     de_strag_(iat1, im) = new straggling_interp(
                             static_cast<StoppingModel>(stopping_),

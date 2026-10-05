@@ -596,6 +596,15 @@
                                 "whatsThis": ""
                             },
                             {
+                                "name": "compound_correction",
+                                "label": "Compound correction",
+                                "type": "float",
+                                "min": 0.1,
+                                "max": 10,
+                                "toolTip": "Compound correction factor of the electronic stopping (1 = Bragg's rule).",
+                                "whatsThis": "Multiplies the Bragg's rule electronic stopping of the material to account for chemical bonding, as SRIM's \"Compound Correction (Bragg)\". The correction applies at low ion velocities and fades out above about 0.6 MeV/u (Ziegler & Manoyan NIMB 35 (1988) 215). Use 1 for elemental targets or when no correction is known. For compounds in the SRIM dictionary, the value is shown in SRIM's TRIM setup window."
+                            },
+                            {
                                 "name": "composition",
                                 "label": "Material composition",
                                 "type": "array",

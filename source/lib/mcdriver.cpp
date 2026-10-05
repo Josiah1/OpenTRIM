@@ -403,6 +403,11 @@ int mcconfig::validate(bool AcceptIncomplete, std::ostream *os) const
                 msg << "(/Target/materials/" << i << "/density) Negative density" << endl;
                 target_ret = false;
             }
+            if (md.compound_correction <= 0.f) {
+                msg << "(/Target/materials/" << i << "/compound_correction) ";
+                msg << "Compound correction must be positive" << endl;
+                target_ret = false;
+            }
             if (md.composition.empty()) {
                 msg << "(/Target/materials/" << i << "/composition) is empty" << endl;
                 target_ret = false;

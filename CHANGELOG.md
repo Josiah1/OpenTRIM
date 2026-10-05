@@ -22,6 +22,10 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   selectable colormaps, energy- and time-based track colouring, playback and a
   track-viewer user guide.
 - Material Database dialog for picking predefined materials from a JSON database.
+- Per-material electronic stopping compound correction
+  (`/Target/materials/N/compound_correction`, default 1 = Bragg's rule), equivalent
+  to SRIM's "Compound Correction (Bragg)" and applied with the Ziegler & Manoyan
+  (1988) velocity dependence. Also exposed as `Material.compound_correction` in Python.
 - UserTally configuration UI in the GUI.
 - Contextual Help Panel in the Config view.
 

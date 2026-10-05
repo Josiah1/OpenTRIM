@@ -272,6 +272,7 @@ void to_json(ojson &j, const material::material_desc_t &md)
     j["density"] = md.density;
     j["composition"] = md.composition;
     j["color"] = md.color;
+    j["compound_correction"] = md.compound_correction;
 }
 
 void from_json(const ojson &nlohmann_json_j, material::material_desc_t &nlohmann_json_t)
@@ -280,6 +281,7 @@ void from_json(const ojson &nlohmann_json_j, material::material_desc_t &nlohmann
     NLOHMANN_JSON_FROM_WITH_DEFAULT(id);
     NLOHMANN_JSON_FROM_WITH_DEFAULT(density);
     NLOHMANN_JSON_FROM_WITH_DEFAULT(color);
+    NLOHMANN_JSON_FROM_WITH_DEFAULT(compound_correction);
 
     if (nlohmann_json_j["composition"].is_array())
         nlohmann_json_t.composition =

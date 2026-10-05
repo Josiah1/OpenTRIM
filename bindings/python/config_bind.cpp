@@ -136,6 +136,9 @@ void bind_config(py::module_ &m)
                            "List of Atom objects (AtomList).")
             .def_readwrite("color", &material::material_desc_t::color,
                            "Hex color string for GUI display, e.g. '#55aaff'.")
+            .def_readwrite("compound_correction", &material::material_desc_t::compound_correction,
+                           "Compound correction factor of the electronic stopping "
+                           "(1 = Bragg's rule), as SRIM's 'Compound Correction (Bragg)'.")
             .def("__repr__", [](const material::material_desc_t &m) {
                 return "Material(id=\"" + m.id + "\", density=" + std::to_string(m.density)
                         + ", natoms=" + std::to_string(m.composition.size()) + ")";

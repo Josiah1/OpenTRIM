@@ -96,6 +96,7 @@ material::material_desc_t material::getDescription() const
     material_desc_t md;
     md.id = name_;
     md.density = massDensity_;
+    md.compound_correction = compoundCorrection_;
     for (const atom *a : atoms_)
         md.composition.push_back(a->p_);
     return md;
@@ -173,6 +174,7 @@ material *target::addMaterial(const material::material_desc_t &md)
 {
     material *m = addMaterial(md.id.c_str());
     m->setMassDensity(md.density);
+    m->setCompoundCorrection(md.compound_correction);
     for (auto &a : md.composition)
         m->addAtom(a);
     return m;

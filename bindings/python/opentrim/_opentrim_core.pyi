@@ -790,6 +790,14 @@ class Material:
     def composition(self, arg0: AtomList) -> None:
         ...
     @property
+    def compound_correction(self) -> float:
+        """
+        Compound correction factor of the electronic stopping (1 = Bragg's rule), as SRIM's 'Compound Correction (Bragg)'.
+        """
+    @compound_correction.setter
+    def compound_correction(self, arg0: typing.SupportsFloat | typing.SupportsIndex) -> None:
+        ...
+    @property
     def density(self) -> float:
         """
         Mass density [g/cm3].

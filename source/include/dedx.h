@@ -81,7 +81,7 @@ typedef dedx_erange::iterator dedx_iterator;
  *
  * Monoatomic and polyatomic targets are covered by
  * the two different constructors. In polyatomic materials the Bragg
- * mixing rule is applied.
+ * mixing rule is applied, optionally with a compound correction factor.
  *
  * Call the base class log_interp::operator() to obtain the stopping
  * power in eV/nm at a given projectile energy in eV.
@@ -98,7 +98,7 @@ typedef dedx_erange::iterator dedx_iterator;
 class dedx_interp : public dedx_erange::log_log_interp
 {
     int init(StoppingModel m, int Z1, float M1, const std::vector<int> &Z2,
-             const std::vector<float> &X2, float atomicDensity);
+             const std::vector<float> &X2, float atomicDensity, float compoundCorr = 1.f);
 
 public:
     constexpr static const int Zmax = ZMAX;
@@ -142,9 +142,10 @@ public:
      * @param Z2 vector of target atom atomic numbers
      * @param X2 vector of target atomic fractions (sum of X2 assumed equal to 1.0)
      * @param N target atomic density in [at/nm3]
+     * @param compoundCorr compound correction factor (1 = pure Bragg rule)
      */
     dedx_interp(StoppingModel m, int Z1, const std::vector<int> &Z2, const std::vector<float> &X2,
-                float N = 1);
+                float N = 1, float compoundCorr = 1.f);
     /**
      * @brief Construct an interpolator for polyatomic targets
      *
@@ -154,15 +155,21 @@ public:
      * \f]
      * where the sum is over all atomic species in the target.
      *
+     * If compoundCorr \f$ C \ne 1\f$, the result is multiplied by
+     * \f$ 1 + (C-1)f(E) \f$, where \f$ f(E) \f$ is \f$\approx 1\f$ at low ion velocity and fades
+     * out above \f$\approx\f$ 0.6 MeV/u (Ziegler & Manoyan NIMB 35 (1988) 215).
+     * This is equivalent to SRIM's "Compound Correction (Bragg)".
+     *
      * @param m Electronic stopping model
      * @param Z1 projectile atomic number
      * @param M1 projectile atomic mass
      * @param Z2 vector of target atom atomic numbers
      * @param X2 vector of target atomic fractions (sum of X2 assumed equal to 1.0)
      * @param N target atomic density in [at/nm3]
+     * @param compoundCorr compound correction factor (1 = pure Bragg rule)
      */
     dedx_interp(StoppingModel m, int Z1, float M1, const std::vector<int> &Z2,
-                const std::vector<float> &X2, float N = 1);
+                const std::vector<float> &X2, float N = 1, float compoundCorr = 1.f);
 };
 
 /**

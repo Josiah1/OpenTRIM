@@ -341,3 +341,28 @@ def test_user_tally_end_to_end(config):
     assert data.shape == sem.shape
     assert np.isfinite(data).all()
     assert (sem >= 0).all()
+
+
+def test_compound_correction(config):
+    # survives a JSON round trip
+    config.Target.materials[0].compound_correction = 0.9
+    cfg2 = opentrim.Config.from_json(config.to_json())
+    assert cfg2.Target.materials[0].compound_correction == pytest.approx(0.9)
+
+    # out-of-range values are rejected
+    config.Target.materials[0].compound_correction = 0.0
+    with pytest.raises(ValueError):
+        config.validate()
+
+    def stopping(corr):
+        config.Target.materials[0].compound_correction = corr
+        info = opentrim.Info(opentrim.Driver(config))
+        return (np.asarray(info["target"]["dedx"]["erg"]),
+                np.asarray(info["target"]["dedx"]["stopping"])[0, 0])  # [He, material 0]
+
+    E, s1 = stopping(1.0)
+    _, s9 = stopping(0.9)
+    r = s9 / s1
+    # full correction at low ion velocity, none at high velocity (He: 4 amu)
+    assert r[E < 100e3] == pytest.approx(0.9, abs=1e-4)
+    assert r[E > 100e6] == pytest.approx(1.0, abs=1e-4)

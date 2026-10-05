@@ -174,6 +174,7 @@ class material : public target_item
     int id_;
     std::string name_;
     float massDensity_; // gr/cm^3
+    float compoundCorrection_{ 1.f };
 
     std::vector<atom *> atoms_;
     std::vector<float> X_;
@@ -217,6 +218,12 @@ public:
          * @brief Color specification for display purposes
          */
         std::string color{ "#55aaff" };
+        /**
+         * @brief Compound correction factor of the electronic stopping
+         *
+         * Equivalent to SRIM's "Compound Correction (Bragg)". 1 = pure Bragg's rule.
+         */
+        float compound_correction{ 1.f };
     };
 
     explicit material(const char *name);
@@ -253,6 +260,10 @@ public:
     float massDensity() const { return massDensity_; }
     /// Returns the atomic radius \f$ (4\pi N/3)^{-1/3} \f$ [nm]
     float atomicRadius() const { return atomicRadius_; }
+    /// Set the electronic stopping compound correction factor (1 = Bragg's rule)
+    void setCompoundCorrection(float v) { compoundCorrection_ = v; }
+    /// Returns the electronic stopping compound correction factor
+    float compoundCorrection() const { return compoundCorrection_; }
 
     // this is used for generating options structure
     material_desc_t getDescription() const;
