@@ -134,7 +134,7 @@ private:
         erg_ -= de;
         if (s)
             *s += de;
-        assert(finite(erg_));
+        assert(std::isfinite(erg_));
     }
 
 public:
@@ -289,7 +289,7 @@ public:
     void setErg(double e)
     {
         erg_ = erg0_ = e;
-        assert(finite(erg_));
+        assert(std::isfinite(erg_));
         assert(erg_ > 0);
     }
 
@@ -297,7 +297,7 @@ public:
     void setTime(double t)
     {
         t_ = t0_ = t;
-        assert(finite(t_));
+        assert(std::isfinite(t_));
         assert(t_ >= 0.0);
     }
 

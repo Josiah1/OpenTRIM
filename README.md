@@ -39,7 +39,7 @@ On **Windows**, download the latest [binary distribution release](https://github
 
 ### Building from source
 
-There are build instructions for [linux](./dist/linux_build.md) and [windows](./dist/mingw64/win_build_recipe.md).
+There are build instructions for [linux](./dist/linux_build.md), [macOS](./dist/macos_build.md) and [windows](./dist/mingw64/win_build_recipe.md).
 
 ## Usage
 

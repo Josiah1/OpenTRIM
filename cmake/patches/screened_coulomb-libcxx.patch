@@ -1,0 +1,51 @@
+diff --git a/include/screened_coulomb.h b/include/screened_coulomb.h
+index efbbdd7..762ed4f 100644
+--- a/include/screened_coulomb.h
++++ b/include/screened_coulomb.h
+@@ -311,7 +311,7 @@ public:
+ 
+ private:
+     Functor &func_;
+-    constexpr static auto u_{ []() constexpr {
++    inline static const auto u_{ []() {
+         const double d = 0.5 * M_PI / N;
+         std::array<double, N> u{};
+         for (int i = 0; i < N; ++i) {
+@@ -319,7 +319,7 @@ private:
+         }
+         return u;
+     }() };
+-    constexpr static auto w_{ []() constexpr {
++    inline static const auto w_{ []() {
+         const double d = 0.5 * M_PI / N;
+         std::array<double, N> w{};
+         for (int i = 0; i < N; ++i) {
+@@ -541,7 +541,27 @@ static double bessel_k1(double x)
+ {
+     // sqrt(pi/2)
+     constexpr static const double sqrtpihalf = 1.25331413731550012081;
+-    return (x > 200) ? sqrtpihalf * exp(-x) / std::sqrt(x) : std::cyl_bessel_k(1, x);
++    if (x > 200)
++        return sqrtpihalf * exp(-x) / std::sqrt(x);
++#if defined(__cpp_lib_math_special_functions) || defined(__STDCPP_MATH_SPEC_FUNCS__)
++    return std::cyl_bessel_k(1, x);
++#else
++    // The standard library lacks C++17 special math functions (e.g. libc++).
++    // K1(x) = exp(-x) * Int_0^inf exp(-x (cosh t - 1)) cosh t dt, evaluated by the
++    // trapezoidal rule, which converges exponentially for this integrand
++    // (Trefethen & Weideman, SIAM Rev. 56 (2014) 385). A step h ~ 1/sqrt(x) resolves
++    // the peak at large x. Max relative error vs std::cyl_bessel_k: 1.5e-14 for 1e-12 < x <= 200.
++    const double h = std::fmin(0.1, 0.5 / std::sqrt(x));
++    double s = 0.5;
++    for (int k = 1;; ++k) {
++        double c = std::cosh(k * h);
++        double f = std::exp(-x * (c - 1)) * c;
++        s += f;
++        if (f < 1e-17 * s)
++            break;
++    }
++    return h * s * std::exp(-x);
++#endif
+ }
+ 
+ } // namespace detail

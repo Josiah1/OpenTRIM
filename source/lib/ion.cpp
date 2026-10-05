@@ -162,7 +162,7 @@ BoundaryCrossing ion::propagate(float &fp)
             // propagate to the boundary
             x = pos_;
             fp = grid_->bring2boundary(icell_, x, dir_);
-            assert(finite(fp));
+            assert(std::isfinite(fp));
             grid_->apply_bc(x);
             ivector3 ix = grid_->pos2cell(x);
             path_ += fp;
@@ -197,7 +197,7 @@ BoundaryCrossing ion::propagate(float &fp)
         // @ToDo more debugging needed here
         x = pos_;
         fp = grid_->bring2boundary(icell_, x, dir_);
-        assert(finite(fp));
+        assert(std::isfinite(fp));
         path_ += fp;
         t_ += fp / std::sqrt(erg_) * s_erg_to_t_;
         grid_->apply_bc(x);
@@ -227,7 +227,7 @@ float ion::move(float s)
             // propagate to the boundary
             x = pos_;
             fp = grid_->bring2boundary(icell_, x, dir_);
-            assert(finite(fp));
+            assert(std::isfinite(fp));
             grid_->apply_bc(x);
             ivector3 ix = grid_->pos2cell(x);
             pos_ = x;

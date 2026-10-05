@@ -1,0 +1,28 @@
+diff --git a/include/ieee754_seq.h b/include/ieee754_seq.h
+index 26790a6..cd5dd2c 100644
+--- a/include/ieee754_seq.h
++++ b/include/ieee754_seq.h
+@@ -178,11 +178,21 @@ private:
+     constexpr static const int_type mantissa_mask = Nm - 1;
+     constexpr static const int_type exp_mask = (int_type(1) << traits::exponent_digits()) - 1;
+ 
++    // log2(y) for 1 <= y < 2, usable in constant expressions (std::log2 is not
++    // constexpr in Clang/libc++). Uses ln(y) = 2 atanh(z), z = (y-1)/(y+1) <= 1/3,
++    // summed in double precision: accurate to a few ulp of double.
++    constexpr static double log2_1to2_(double y)
++    {
++        double z = (y - 1) / (y + 1), z2 = z * z, t = z, s = 0;
++        for (int k = 0; k < 40; ++k, t *= z2)
++            s += t / (2 * k + 1);
++        return 2 * s * 1.442695040888963407359924681001892137; // 1/ln(2)
++    }
++
+     constexpr static auto log2_m_{ []() constexpr {
+         std::array<real_type, Nm> w{};
+-        real_type f = real_type(1) / Nm;
+         for (int_type i = 0; i < Nm; ++i)
+-            w[i] = std::log2(1 + f * i);
++            w[i] = real_type(log2_1to2_(1 + double(i) / Nm));
+         return w;
+     }() };
+ 

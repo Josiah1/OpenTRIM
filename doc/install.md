@@ -90,4 +90,6 @@ ninja install
 The default install location is `$HOME/.local`, thus `sudo` is not required.
 Override this by setting the option `-DCMAKE_INSTALL_PREFIX="/your/install/location"` when calling `cmake`. 
 
+On **macOS** the core library, the CLI and the Python bindings build with the native Apple Clang compiler, with dependencies from [Homebrew](https://brew.sh). See `dist/macos_build.md` in the source tree. The GUI has not been tested on macOS.
+
 On **Windows** the project can be built with [MSYS2](https://www.msys2.org/). Detailed instructions will be given in the future.

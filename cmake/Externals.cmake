@@ -6,6 +6,15 @@ set(FETCHCONTENT_TRY_FIND_PACKAGE_MODE NEVER)
 
 option(PACKAGE_BUILD "Flag for building binary package without internet and localy downloaded externals." OFF)
 
+find_package(Git REQUIRED)
+
+# PATCH_COMMAND arguments that apply cmake/patches/<name>.patch to a fetched source tree
+function(opentrim_patch_command var name)
+   set(${var} PATCH_COMMAND ${CMAKE_COMMAND} -DGIT_EXECUTABLE=${GIT_EXECUTABLE}
+      -DPATCH_FILE=${CMAKE_CURRENT_FUNCTION_LIST_DIR}/patches/${name}.patch
+      -P ${CMAKE_CURRENT_FUNCTION_LIST_DIR}/ApplyPatch.cmake PARENT_SCOPE)
+endfunction()
+
 FetchContent_Declare(external_CLI11
    GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
    GIT_TAG v2.6.1
@@ -99,11 +108,18 @@ if(PACKAGE_BUILD)
 endif()
 FetchContent_MakeAvailable(external_spline)
 
+# screened_coulomb and ieee754_seq are pinned to a commit (main HEAD as of
+# 2026-10-05) because they are patched for Clang/libc++ (Apple Clang): libc++
+# lacks std::cyl_bessel_k and std::log2/std::cos are not constexpr in Clang.
+# The patches give bit-identical tables with GCC. Drop them once upstream has
+# equivalent fixes. Patches are not applied in PACKAGE_BUILD (local sources).
+opentrim_patch_command(screened_coulomb_patch screened_coulomb-libcxx)
 FetchContent_Declare(external_screened_coulomb
    GIT_REPOSITORY https://github.com/ir2-lab/screened_coulomb.git
-   GIT_TAG main
+   GIT_TAG f84c3c8246a40c70f68d3812a3feb6022f03fb9a
    GIT_SUBMODULES_RECURSE FALSE
-   GIT_SHALLOW TRUE
+   GIT_SHALLOW FALSE
+   ${screened_coulomb_patch}
    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
 )
 if(PACKAGE_BUILD)
@@ -111,11 +127,13 @@ if(PACKAGE_BUILD)
 endif()
 FetchContent_MakeAvailable(external_screened_coulomb)
 
+opentrim_patch_command(ieee754_seq_patch ieee754_seq-libcxx)
 FetchContent_Declare(external_ieee754_seq
    GIT_REPOSITORY https://github.com/ir2-lab/ieee754_seq.git
-   GIT_TAG main
+   GIT_TAG da4f0ba3e666d02a5f4a08ece977d2f11837653f
    GIT_SUBMODULES_RECURSE FALSE
-   GIT_SHALLOW TRUE
+   GIT_SHALLOW FALSE
+   ${ieee754_seq_patch}
    CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
 )
 if(PACKAGE_BUILD)

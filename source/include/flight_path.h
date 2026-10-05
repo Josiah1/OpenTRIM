@@ -1,6 +1,7 @@
 #ifndef FLIGHT_PATH_H
 #define FLIGHT_PATH_H
 
+#include <cmath>
 #include <ieee754_seq.h>
 #include "arrays.h"
 #include "random_vars.h"
@@ -184,7 +185,7 @@ public:
             assert(false); // never get here
         }
         assert(fp > 0);
-        assert(finite(fp));
+        assert(std::isfinite(fp));
         return doCollision;
     }
 

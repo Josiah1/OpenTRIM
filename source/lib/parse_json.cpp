@@ -4,6 +4,7 @@
 #include "user_tally.h"
 #include <iostream>
 #include <sstream>
+#include <utility>
 
 using std::cerr;
 using std::cout;
@@ -429,7 +430,7 @@ bool mcconfig::get(const std::string &path, std::string &json_str, std::ostream 
 void mcconfig::set_impl_(const std::string &path, const std::string &json_str)
 {
     ojson j(*this);
-    ojson::json_pointer ptr(path.c_str());
+    const ojson::json_pointer ptr(path.c_str());
     ojson v = ojson::parse(json_str);
     j.at(ptr) = v;
     *this = j;
@@ -440,7 +441,7 @@ void mcconfig::set_impl_(const std::string &path, const std::string &json_str)
 void mcconfig::get_impl_(const std::string &path, std::string &json_str) const
 {
     ojson j(*this);
-    ojson::json_pointer ptr(path.c_str());
+    const ojson::json_pointer ptr(path.c_str());
     ojson::const_reference vref = j.at(ptr);
     std::ostringstream ss;
     ss << vref.dump();
@@ -552,6 +553,13 @@ bool validate_simple_value(const ojson &spec, ojson::const_reference &vref,
     return ret;
 }
 
+// Lookup by a const json_pointer: a non-const one selects a deprecated at() overload (Clang warns)
+static const ojson &at_path(const ojson &j, const std::string &path)
+{
+    const ojson::json_pointer ptr(path);
+    return j.at(ptr);
+}
+
 bool validate_helper(const ojson &spec, const ojson &opt, const std::string &path, bool strict,
                      std::ostream &os)
 {
@@ -572,8 +580,7 @@ bool validate_helper(const ojson &spec, const ojson &opt, const std::string &pat
         if (strict) {
             try {
                 std::string struct_path = path + name;
-                const ojson &struct_node =
-                        path.empty() ? opt : opt.at(ojson::json_pointer(struct_path));
+                const ojson &struct_node = path.empty() ? opt : at_path(opt, struct_path);
 
                 if (struct_node.is_object()) {
                     for (auto &[key, val] : struct_node.items()) {
@@ -599,7 +606,7 @@ bool validate_helper(const ojson &spec, const ojson &opt, const std::string &pat
 
     // try if json key exists
     std::string jpath(path + name);
-    ojson::json_pointer ptr(jpath);
+    const ojson::json_pointer ptr(jpath);
     try {
         ojson::const_reference vref = opt.at(ptr);
     } catch (const ojson::out_of_range &e) {
@@ -633,7 +640,7 @@ bool validate_helper(const ojson &spec, const ojson &opt, const std::string &pat
                 std::string item_obj_path = jpath + "/" + std::to_string(k);
                 std::string item_path = item_obj_path + "/";
                 if (strict) {
-                    const ojson &item_node = opt.at(ojson::json_pointer(item_obj_path));
+                    const ojson &item_node = at_path(opt, item_obj_path);
                     if (item_node.is_object()) {
                         for (auto &[key, val] : item_node.items()) {
                             if (std::find(item_known_names.begin(), item_known_names.end(), key)
@@ -744,7 +751,7 @@ ojson spec_for_path(const ojson &config, const ojson::json_pointer &jptr, std::o
             }
             built_ptr.push_back(t);
             try {
-                config.at(built_ptr);
+                config.at(std::as_const(built_ptr));
             } catch (const ojson::exception &) {
                 std::ostringstream msg;
                 msg << "(" << built_ptr.to_string() << ") ";
@@ -757,7 +764,7 @@ ojson spec_for_path(const ojson &config, const ojson::json_pointer &jptr, std::o
             cur_spec = cur_spec["items"];
             built_ptr.push_back(t);
             try {
-                config.at(built_ptr);
+                config.at(std::as_const(built_ptr));
             } catch (const ojson::exception &) {
                 std::ostringstream msg;
                 msg << "(" << built_ptr.to_string() << ") ";

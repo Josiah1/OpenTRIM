@@ -269,7 +269,7 @@ const char *mytimefmt_(double t, bool ceil = false)
     dv = ldiv(dv.quot, 60L);
     long m = dv.rem;
 
-    sprintf(buff, "%02ld:%02ld:%02ld", dv.quot, m, s);
+    snprintf(buff, sizeof(buff), "%02ld:%02ld:%02ld", dv.quot, m, s);
     return buff;
 }
 
@@ -314,7 +314,7 @@ void running_sim_info::print()
 
     // print progress percentage
     char buff[8];
-    sprintf(buff, "%3d%%", progress_ * 100 / max_progress_);
+    snprintf(buff, sizeof(buff), "%3d%%", progress_ * 100 / max_progress_);
     cout << buff;
 
     cout << sep;
@@ -377,7 +377,7 @@ void running_sim_info::print()
 
     // print progress percentage
     char buff[16];
-    sprintf(buff, "%3d%%", progress_ * 100 / max_progress_);
+    snprintf(buff, sizeof(buff), "%3d%%", progress_ * 100 / max_progress_);
     cout << buff;
 
     cout << sep;

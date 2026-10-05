@@ -481,7 +481,7 @@ int mccore::transport(ion *i)
         float T; // recoil energy
         float sintheta, costheta; // Lab sys scattering angle sin & cos
         xs->scatter(i->erg(), ip, T, sintheta, costheta);
-        assert(finite(T));
+        assert(std::isfinite(T));
 
         // get random azimuthal dir
         float nx, ny; // nx = cos(phi), ny = sin(phi), phi: az. angle

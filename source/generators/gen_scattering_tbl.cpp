@@ -118,7 +118,7 @@ int gen_scattering_tbl(const std::string &short_screening_name)
             //     // exit(-1);
             // }
 
-            if (finite(mu))
+            if (std::isfinite(mu))
                 ofs << std::setw(ndig + 8) << mu << 'f';
             else
                 ofs << std::setw(ndig + 8) << "-1.0f/0.0f";

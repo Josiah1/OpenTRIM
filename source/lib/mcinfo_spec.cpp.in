@@ -90,7 +90,7 @@ std::string mcinfo::info_spec()
             tally_specs.push_back(group_j);
         }
 
-        ojson::json_pointer ptr("/objects/3/objects");
+        const ojson::json_pointer ptr("/objects/3/objects");
         info_specs[ptr] = tally_specs;
     }
 
