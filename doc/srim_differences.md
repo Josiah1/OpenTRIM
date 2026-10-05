@@ -12,7 +12,7 @@ The benchmark in `test/srim_comp` compares 5 ions (1 MeV H, 1 MeV He, 3 MeV Al, 
 | Full Cascade (FC), excluding Cu | 2.0% | 5.7% |
 | Full Cascade (FC), Cu target | | +8% (H) to +19% (Au), unexplained |
 
-- **Replacements:** OpenTRIM counts 30–32% fewer replacement collisions than SRIM-FC in all 7 damage-profile benchmarks in `test/` (e.g. 3260 vs 4810 per ion for 2 MeV Fe in Fe), while vacancies agree within 4%. The replacement criterion is described in \ref damage-events. Compare vacancies, not replacements, between the two codes.
+- **Replacements:** in the 5 heavy-ion damage-profile benchmarks in `test/` (Fe in Fe, Xe in UO<sub>2</sub>), OpenTRIM counts 30–32% fewer replacement collisions than SRIM-FC (e.g. 3260 vs 4810 per ion for 2 MeV Fe in Fe), while vacancies agree within 4%. The 2 H benchmarks are similar, but SRIM reports only 7–21 events per ion there, rounded to integers. The replacement criterion is described in \ref damage-events. Compare vacancies, not replacements, between the two codes.
 - **Light ions:** SRIM-FC distributes recoil damage along long free flight paths, which can create artificial peaks and dips in the damage profile of light ions. The SRIM workaround (monolayer mode) is described in `test/README.md`.
 
 ## Electronic stopping
