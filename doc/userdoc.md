@@ -7,6 +7,7 @@
 - \subpage out_file "The HDF5 output archive"
 - \subpage tallies
 - \subpage reproducibility
+- \subpage srim-diff "Differences from SRIM"
 
 \page cliapp Using the command line application 
 

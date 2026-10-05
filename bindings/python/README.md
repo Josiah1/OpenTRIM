@@ -58,6 +58,21 @@ config.IonBeam.energy_distribution.center = 2e6   # 2 MeV
 config.Run.max_no_ions = 10000
 config.Run.seed = 42                              # fixed seed -> reproducible
 
+# Target: 4 um Fe slab, 200 cells along x
+mat = opentrim.Material()
+mat.id, mat.density = "Fe", 7.874                 # g/cm3
+atom = opentrim.Atom()
+atom.element = opentrim.Element("Fe")
+atom.X, atom.Ed, atom.El, atom.Er = 1.0, 40.0, 3.0, 40.0
+mat.composition.append(atom)
+config.Target.materials.append(mat)
+
+region = opentrim.Region()
+region.id, region.material_id, region.size = "slab", "Fe", [4000, 4000, 4000]
+config.Target.regions.append(region)
+config.Target.size = [4000, 4000, 4000]           # nm
+config.Target.cell_count = [200, 1, 1]
+
 config.validate()   # raises ValueError if invalid
 
 # Optional: inspect the full JSON
@@ -66,20 +81,21 @@ print(config.to_json())
 # 2. Run the simulation
 sim = opentrim.Driver(config)
 
-def on_progress(frac):
-    print(f"\rprogress: {100*frac:5.1f}%", end="")
+def on_progress():
+    print(f"\rions: {sim.ion_count()}", end="")
 
-sim.run(on_progress)   # Mode B: blocking, with progress callback
+sim.run(on_progress)   # Mode B: blocking, calls on_progress() every second
 print("\ndone")
 
 # 3. Read results
 info = opentrim.Info(sim)
 
-x = info["target"]["grid"]["x"]                       # target depth grid (nm)
-vacancies, sem = info["tally"]["damage_events"]["Vacancies"]  # vacancies/ion ± SEM
+x = info["target"]["grid"]["X"]                       # cell edges along x (nm)
+x = 0.5 * (x[:-1] + x[1:])                            # cell centers
+v, dv = info["tally"]["damage_events"]["Vacancies"]   # [atoms, Nx, Ny, Nz], per ion ± SEM
 
 import matplotlib.pyplot as plt
-plt.plot(x, vacancies)
+plt.plot(x, v.sum(axis=0)[:, 0, 0])
 plt.xlabel("x (nm)")
 plt.ylabel("Vacancies / ion")
 
@@ -115,7 +131,7 @@ folder.
 | ------------------------------ | --------------------------------------------------------------- |
 | `Driver(config)`               | Construct and initialise from a `Config`                        |
 | `run()`                        | Mode A: start simulation, return immediately; use with `wait()` |
-| `run(callback, interval_ms)`   | Mode B: run on the calling thread, calling `callback(frac)`     |
+| `run(callback, interval_ms)`   | Mode B: run on the calling thread, calling `callback()`         |
 | `wait()`                       | Block until a Mode A run finishes                               |
 | `config()`                     | Return a copy of the active `Config`                            |
 | `save(fn)` / `Driver.load(fn)` | HDF5 serialisation                                              |
@@ -146,4 +162,4 @@ folder.
 
 ## License
 
-MIT — see [`COPYING`](../../COPYING).
+MIT — see [`LICENSE`](../../LICENSE).

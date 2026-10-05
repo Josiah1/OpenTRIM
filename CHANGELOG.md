@@ -28,6 +28,22 @@ and the project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   (1988) velocity dependence. Also exposed as `Material.compound_correction` in Python.
 - UserTally configuration UI in the GUI.
 - Contextual Help Panel in the Config view.
+- macOS build instructions (`dist/macos_build.md`) and a "Differences from SRIM"
+  documentation page.
+
+### Fixed
+- Builds with native Apple Clang / libc++ on macOS: `finite()` replaced by
+  `std::isfinite`, and the fetched `screened_coulomb` and `ieee754_seq` are pinned
+  and patched (`cmake/patches/`) for the missing `std::cyl_bessel_k` and the
+  non-constexpr `std::log2`/`std::cos`. Tables are unchanged with GCC. Also removed
+  the nlohmann `json_pointer` deprecation warnings.
+- Config validation rejects ion energies above the range of the stopping and
+  scattering tables (at most 2^30 eV ≈ 1.07 GeV, less for light ions in light
+  targets), which were silently clamped before.
+- HDF5 output docs now match the file: `/target` group, `stopping` and
+  `straggling` datasets.
+- Python README example (progress callback signature, dataset paths).
+- `sprintf` replaced by `snprintf` in the CLI.
 
 ### Changed
 - Core library extended to stream ion-track and event data to the GUI or

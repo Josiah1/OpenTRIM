@@ -313,7 +313,8 @@ mcinfo::mcinfo(std::shared_ptr<mcdriver> d) : mcinfo_node({ }, nullptr), driver_
                     });
 
             dedx.add_data(
-                    "straggling", "electronic straggling [eV], array [ions x materials x energy]",
+                    "straggling",
+                    "electronic straggling [eV/nm^(1/2)], array [ions x materials x energy]",
                     [](const mcinfo_data_node &i, mcinfo_data_node::dim_t &d) {
                         auto &dim =
                                 i.parent()->driver()->getSim()->get_dedx_calc().de_strag().dim();

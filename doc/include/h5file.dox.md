@@ -58,7 +58,7 @@
 <td>Numeric
 <td>[4]
 <td>Random number generator state
-<tr><td>&emsp;&emsp;Target/
+<tr><td>&emsp;&emsp;target/
 <td>Group<td><td>Information about the simulated target structure
 <tr><td>&emsp;&emsp;&emsp;&emsp;grid/
 <td>Group<td><td>Description of the 3D spatial grid
@@ -140,11 +140,11 @@
 <td>Numeric
 <td>\f$[N_{e}]\f$
 <td>Stopping table energy grid [eV]
-<tr><td>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;dEdx
+<tr><td>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;stopping
 <td>Numeric
 <td>\f$[N_{at},N_{mat},N_e]\f$
 <td>Electronic stopping power [eV/nm]
-<tr><td>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;strag
+<tr><td>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;straggling
 <td>Numeric
 <td>\f$[N_{at},N_{mat},N_e]\f$
 <td>Electronic straggling [eV/nm^1/2]

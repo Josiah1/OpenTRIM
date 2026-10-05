@@ -102,7 +102,7 @@
             ]
         },
         {
-            "id": "Target",
+            "id": "target",
             "type": "Group",
             "description": "Information about the simulated target structure",
             "objects": [
@@ -259,14 +259,14 @@
                             "size": "\\f$[N_{e}]\\f$"
                         },
                         {
-                            "id": "dEdx",
+                            "id": "stopping",
                             "type": "Dataset",
                             "datatype": "Numeric",
                             "description": "Electronic stopping power [eV/nm]",
                             "size": "\\f$[N_{at},N_{mat},N_e]\\f$"
                         },
                         {
-                            "id": "strag",
+                            "id": "straggling",
                             "type": "Dataset",
                             "datatype": "Numeric",
                             "description": "Electronic straggling [eV/nm^1/2]",
